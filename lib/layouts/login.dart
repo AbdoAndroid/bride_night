@@ -1,11 +1,13 @@
-import 'package:bride_night/layouts/home_page.dart';
+import 'package:bride_night/layouts/normal_user_home.dart';
 import 'package:bride_night/layouts/register.dart';
+import 'package:bride_night/layouts/service_provider_home.dart';
 import 'package:bride_night/model/user.dart';
+import 'package:bride_night/service/auth.dart';
+import 'package:bride_night/shared/alert_dialog.dart';
 import 'package:bride_night/shared/login_background.dart';
 import 'package:bride_night/shared/progress_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
-
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -13,8 +15,6 @@ class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
-
-User? CurrentUser;
 
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController userNameController = TextEditingController();
@@ -32,32 +32,28 @@ class _LoginScreenState extends State<LoginScreen> {
           mobile: value.get('mobile', defaultValue: ' ') as String);
     });
     setState(() {
-      CurrentUser = user;
+      currentUser = user;
     });
     return user;
   }
 
   _login() async {
     showProgress(context, "Loading ...", true);
-    User user =User(name: 'Ahmed',id: '0',normalUser: true,userName: 'a',mobile: '',password: passwordController.text); /*await login(context, userNameController.text, passwordController.text);*/
-    if (user != null) {
-      if (user.id !='') {
-        await Hive.openBox('login').then((box) {
-          hideProgress();
-          box.put('userID', user.id);
-          box.put('normalUser', user.normalUser);
-          box.put('userName', user.userName);
-          box.put('name', user.name);
-          box.put('password', user.password);
-          box.put('mobile', user.mobile);
-        });
-        setState(() {
-          CurrentUser = user;
-        });
-        await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(user: CurrentUser!)));
+    int loginRes = await login(userNameController.text, passwordController.text);
+    if (loginRes == 0) {
+      await hideProgress();
+      showAlertDialog(context, "Invalid username!!");
+    } else if (loginRes == 2) {
+      await hideProgress();
+      showAlertDialog(context, "Invalid password!!");
+    } else {
+      await hideProgress();
+      if (currentUser!.normalUser) {
+        await Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => NormalUserHome()));
       } else {
-        await hideProgress();
-        //Toast.show("خطأ باسم المستخدم او كلمة المرور", duration: Toast.lengthLong, gravity: Toast.center);
+        await Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => ServiceProviderHome()));
       }
     }
   }
@@ -79,7 +75,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: const Text(
                   "Login",
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2661FA), fontSize: 30),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold, color: Color(0xFF2661FA), fontSize: 30),
                   textAlign: TextAlign.left,
                 ),
               ),
@@ -119,13 +116,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     suffixIcon: IconButton(
                       icon: passIsVisible
                           ? const Icon(
-                        Icons.visibility_off,
-                        color: Color(0xFF2661FA),
-                      )
+                              Icons.visibility_off,
+                              color: Color(0xFF2661FA),
+                            )
                           : const Icon(
-                        Icons.visibility,
-                        color: Color(0xFF2661FA),
-                      ),
+                              Icons.visibility,
+                              color: Color(0xFF2661FA),
+                            ),
                       onPressed: () {
                         setState(() {
                           passIsVisible = !passIsVisible;
@@ -153,7 +150,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white, padding: const EdgeInsets.all(0),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.all(0),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(60.0)),
                     ),
@@ -164,8 +162,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: size.width * 0.5,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(80.0),
-                        gradient: const LinearGradient(
-                            colors: [Color.fromARGB(255, 109, 148, 250), Color.fromARGB(255, 188, 205, 250)])),
+                        gradient: const LinearGradient(colors: [
+                          Color.fromARGB(255, 109, 148, 250),
+                          Color.fromARGB(255, 188, 205, 250)
+                        ])),
                     padding: const EdgeInsets.all(0),
                     child: const Text(
                       "Login",
@@ -180,13 +180,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: size.height * 0.05),
               Container(
-                padding: EdgeInsets.only(left: size.width*0.25),
+                padding: EdgeInsets.only(left: size.width * 0.25),
                 child: GestureDetector(
-                  child: const Text(
-                    'Don\'t have an account ? Register Now !'
-                  ),
-                  onTap: (){
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const RegisterScreen()));
+                  child: const Text('Don\'t have an account ? Register Now !'),
+                  onTap: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (context) => const RegisterScreen()));
                   },
                 ),
               ),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class User{
@@ -19,6 +20,21 @@ class User{
       'password': password,
       'service': service,
     };
+  }
+  factory User.fromSnapshot(DocumentSnapshot snapshot) {
+    User u= User.fromJson(snapshot.data() as Map<String, dynamic>);
+    u.id=snapshot.id;
+    return u;
+  }
+  factory User.fromJson(Map<String, dynamic> map) {
+    return User(
+        id: map['Id'],
+        name: map['Name'],
+        userName: map['userName'],
+        mobile: map['mobile'],
+        normalUser: map['normalUser'],
+        password: map['password'],
+        service: map['service']);
   }
 }
 
