@@ -16,6 +16,11 @@ Future<User> getUserById(String id) async {
   return User.fromSnapshot(snapshot);
 }
 
+Future<String> getPhoneById(String id) async {
+  var snapshot = await usersCollection.doc(id).get();
+  return (snapshot.data() as Map<String, dynamic>)['mobile'];
+}
+
 Future<int> login(String username, String password) async {
   var userData = await usersCollection.where("userName", isEqualTo: username).get();
   if (userData.docs.isEmpty) {
@@ -24,6 +29,7 @@ Future<int> login(String username, String password) async {
   User user = User.fromSnapshot(userData.docs.first);
   debugPrint(userData.toString());
   if (user.password == password) {
+    currentUser = user;
     await Hive.openBox('login').then((box) {
       hideProgress();
       box.put('userID', user.id);
@@ -37,4 +43,16 @@ Future<int> login(String username, String password) async {
   } else {
     return 2;
   }
+}
+
+logout() async {
+  await Hive.openBox('login').then((box) {
+    hideProgress();
+    box.put('userID', '');
+    box.put('normalUser', false);
+    box.put('userName', '');
+    box.put('name', '');
+    box.put('password', '');
+    box.put('mobile', '');
+  });
 }

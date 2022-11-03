@@ -1,4 +1,6 @@
+import 'package:bride_night/layouts/login.dart';
 import 'package:bride_night/model/service.dart';
+import 'package:bride_night/service/auth.dart';
 import 'package:flutter/material.dart';
 
 import '../service/services.dart';
@@ -22,7 +24,17 @@ class _ServiceProviderHomeState extends State<ServiceProviderHome> {
               onPressed: () {
                 setState(() {});
               },
-              icon: Icon(Icons.refresh))
+              icon: Icon(Icons.refresh)),
+          IconButton(
+              onPressed: () async {
+                await logout();
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              },
+              icon: const Icon(
+                Icons.logout,
+                color: Colors.red,
+              )),
         ],
       ),
       body: FutureBuilder<List<Service>>(

@@ -12,21 +12,21 @@ class AddServiceDialog extends StatefulWidget {
 }
 
 class _AddServiceDialogState extends State<AddServiceDialog> {
-  TextEditingController categoryController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  TextEditingController cityController = TextEditingController();
   TextEditingController fullAddressController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+  String? city;
+  String? category;
   final _formKey = GlobalKey<FormState>();
   saveData() async {
     if (_formKey.currentState!.validate()) {
       await addService(Service(
           id: '',
           description: descriptionController.text,
-          category: categoryController.text,
+          category: category!,
           providerID: currentUser!.id,
           hasOffer: false,
-          city: cityController.text,
+          city: city!,
           fullAddress: fullAddressController.text,
           price: double.parse(priceController.text)));
       showAlertDialog(context, 'Saved Successfully');
@@ -46,21 +46,130 @@ class _AddServiceDialogState extends State<AddServiceDialog> {
             Container(
               alignment: Alignment.centerRight,
               margin: const EdgeInsets.symmetric(horizontal: 10),
-              child: TextFormField(
-                controller: categoryController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Required data !";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  labelText: "Category",
-                  prefixIcon: Icon(
-                    Icons.category,
-                    color: Color(0xFF2661FA),
+              child: Row(
+                children: [
+                  Text(
+                    "Category",
+                    style: TextStyle(fontSize: 18),
                   ),
-                ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Expanded(
+                    child: FutureBuilder<List<String>>(
+                        future: getCategories(),
+                        builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                          Widget child;
+                          if (snapshot.hasData) {
+                            if (snapshot.data!.isEmpty) {
+                              child = const Padding(
+                                padding: EdgeInsets.only(top: 16),
+                                child: Text('No Categories !'),
+                              );
+                            } else {
+                              child = DropdownButton<String>(
+                                // Initial Value
+                                value: category ?? snapshot.data![0],
+
+                                // Down Arrow Icon
+                                icon: const Icon(Icons.keyboard_arrow_down),
+
+                                // Array list of items
+                                items: snapshot.data!.map((String items) {
+                                  return DropdownMenuItem<String>(
+                                    value: items,
+                                    child: Text(items),
+                                  );
+                                }).toList(),
+                                // After selecting the desired option,it will
+                                // change button value to selected value
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    category = newValue!;
+                                  });
+                                },
+                              );
+                            }
+                          } else if (snapshot.hasError) {
+                            child = Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else {
+                            child = Padding(
+                              padding: EdgeInsets.only(top: 16),
+                              child: Text('Awaiting result...'),
+                            );
+                          }
+                          return child;
+                        }),
+                  ),
+                ],
+              ),
+            ),
+            //City
+            Container(
+              alignment: Alignment.centerRight,
+              margin: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                children: [
+                  Text(
+                    "City",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Expanded(
+                    child: FutureBuilder<List<String>>(
+                        future: getCities(),
+                        builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                          Widget child;
+                          if (snapshot.hasData) {
+                            if (snapshot.data!.isEmpty) {
+                              child = const Padding(
+                                padding: EdgeInsets.only(top: 16),
+                                child: Text('No cities !'),
+                              );
+                            } else {
+                              child = DropdownButton<String>(
+                                // Initial Value
+                                value: city ?? snapshot.data![0],
+
+                                // Down Arrow Icon
+                                icon: const Icon(Icons.keyboard_arrow_down),
+
+                                // Array list of items
+                                items: snapshot.data!.map((String items) {
+                                  return DropdownMenuItem<String>(
+                                    value: items,
+                                    child: Text(items),
+                                  );
+                                }).toList(),
+                                // After selecting the desired option,it will
+                                // change button value to selected value
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    city = newValue!;
+                                  });
+                                },
+                              );
+                            }
+                          } else if (snapshot.hasError) {
+                            child = Padding(
+                              padding: const EdgeInsets.only(top: 16),
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else {
+                            child = Padding(
+                              padding: EdgeInsets.only(top: 16),
+                              child: Text('Awaiting result...'),
+                            );
+                          }
+                          return child;
+                        }),
+                  ),
+                ],
               ),
             ),
             //description
@@ -79,27 +188,6 @@ class _AddServiceDialogState extends State<AddServiceDialog> {
                   labelText: "Description",
                   prefixIcon: Icon(
                     Icons.description,
-                    color: Color(0xFF2661FA),
-                  ),
-                ),
-              ),
-            ),
-            //City
-            Container(
-              alignment: Alignment.centerRight,
-              margin: const EdgeInsets.symmetric(horizontal: 10),
-              child: TextFormField(
-                controller: cityController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Required data !";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  labelText: "City",
-                  prefixIcon: Icon(
-                    Icons.location_city,
                     color: Color(0xFF2661FA),
                   ),
                 ),

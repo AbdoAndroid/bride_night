@@ -42,12 +42,20 @@ dependencies:
   firebase_core: ^2.0.0
   progress_dialog: ^1.2.4
   cloud_firestore: ^4.0.2
+  url_launcher: ^6.1.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.10.0"
 
-  # The "flutter_lints" package below contains a set of recommended lints to
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/brides.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint

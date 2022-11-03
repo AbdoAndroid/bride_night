@@ -48,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
       showAlertDialog(context, "Invalid password!!");
     } else {
       await hideProgress();
+      debugPrint(currentUser.toString());
       if (currentUser!.normalUser) {
         await Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => NormalUserHome()));
@@ -88,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: userNameController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يجب ادخال اسم المستخدم';
+                      return 'This field is required !';
                     }
                     return null;
                   },
@@ -132,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'يجب ادخال كلمة المرور';
+                      return 'This field is required !';
                     }
                     return null;
                   },
@@ -182,7 +183,10 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: EdgeInsets.only(left: size.width * 0.25),
                 child: GestureDetector(
-                  child: const Text('Don\'t have an account ? Register Now !'),
+                  child: const Text(
+                    'Don\'t have an account ? Register Now !',
+                    style: TextStyle(color: Color(0xFF2661FA)),
+                  ),
                   onTap: () {
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => const RegisterScreen()));

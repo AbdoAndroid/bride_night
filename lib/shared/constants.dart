@@ -8,3 +8,5 @@ final Future<FirebaseApp> firebaseInitialization = Firebase.initializeApp();
 final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 final CollectionReference usersCollection = firebaseFirestore.collection('users');
 final CollectionReference servicesCollection = firebaseFirestore.collection('services');
+final CollectionReference citiesCollection = firebaseFirestore.collection('cities');
+final CollectionReference categoriesCollection = firebaseFirestore.collection('categories');
